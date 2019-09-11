@@ -44,12 +44,12 @@ Use output from step 11 and convert to fasta format with bedtools getfasta
 Use Output from step 11 as input  
 Fwd labeled strands are actually reverse, thus the reported start site is actually the stop and the stop site is actually the start. Extended bed file is from the reported start location minus 20.  
 Rev labeled strands are actually forward. Their reported stop site is the actual stop site. The extended bed file is from the stop position to plus 20.  
-13A. Extend bed files by 20bp
+**13A.** Extend bed files by 20bp
 ```
 python Extend_Rev.py
 python Extend_Fwd.py
 ```
-13B. Get fasta sequences for **extended region** bed files from step 12A with bedtools getfasta
+**13B.** Get fasta sequences for **extended region** bed files from step 12A with bedtools getfasta
 
 **14. Convert TString file from fastq to fasta**
 Use Tstring file generated in step 5 as input
@@ -121,4 +121,17 @@ python TString_End_Fwd.py
 ```
 python Match_Rev.py
 ```
+
+**17. Identify PAS-supporting (PASS) Reads**  
+**17A.** Add column to tables used in step 16 indicating if >= 2 unmappable T's downstream of PAS  
+Yes for at least 2 unmappable Ts, No for < 2
+```
+python Pass.py
+```
+**17B.** Make new table with all rows that have Yes in new column (17A)
+```
+sed '/No/d' Rev_PassInfo.txt > Rev_PASS
+sed '/No/d' Fwd_PassInfo.txt > Fwd_PASS
+```
+**18. 
 
