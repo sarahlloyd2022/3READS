@@ -66,11 +66,11 @@ At this point every library should have three files in **fasta** format:
 **16. Identify Last Aligned Position**  
 If a nonT base is found in the TString, then it must be determined if this sequence aligns to the genome. If it aligns, it must be removed from the TString, and added to the aligned sequence. Scripts and steps slightly vary for forward and reverse strands. For both, a new fasta file is made with TSTring sequence from NonT base to the end and fasta sequences are converted to tables. A python script can then be used to search for matches in the TStrings (step 14) to the sequence in the extended region (step 13). 
 
-**Forward Strand**  (Labeled Forward, but actually reverse)
+**Forward Strand** (Labeled Forward, but actually reverse)  
 **16FwdA.** Pull out TStrings where IDs are also in aligned region file
 ```
 #Generate list of sequence IDs that were aligned
-grep '^>' Step12Output > RealIDs_Fwd
+grep '^>' Step12Output_Fwd > RealIDs_Fwd
 cut -c 2- RealIDs_Fwd > CutRealIDs_Fwd
 
 #Make file with all TStrings that can be found in the aligned reads
@@ -84,13 +84,41 @@ python TString_End_Fwd.py
 **16FwdC.** Use fasta_formatter to make tables with Fasta ID, TString sequence (Step 14), Sequence from NonT base to end (Step 16FwdB), Extended region sequence (Step13B), Aligned region sequence (Step 12), chromosome (Step 11), start position (Step 11), and end position (Step 11).
 
 **16FwdD.** For forward strands, if there is a NonT base in the Tstring AND the sequence from the NonT base to the END matches the END of the extended sequence, then:  
-- Matching sequence is added to beginning aligned read
-- Matching sequence is removed from Tstring
-- Matching sequence is removed from extended sequence
-- The length of the matching sequence is subtracted from the listed start 
-position for the aligned read. (This is actually the stop position.)
-
+- Matching sequence is added to beginning aligned read  
+- Matching sequence is removed from Tstring  
+- Matching sequence is removed from extended sequence  
+- The length of the matching sequence is subtracted from the listed start position for the aligned read. 
 ```
 python Match_Fwd.py
+```
+**Reverse Strand** (Labeled Reverse, but actually forward)  
+**16RevA.** Pull out TStrings where IDs are also in aligned region file
+```
+#Generate list of sequence IDs that were aligned
+grep '^>' Step12Output_Rev > RealIDs_Rev
+cut -c 2- RealIDs_Rev > CutRealIDs_Rev
+
+#Make file with all TStrings that can be found in the aligned reads
+#For below, TString.fasta is output from step 14 and should be a fasta file with all TStrings 
+./faSomeRecords TString.fasta CutRealIDs_Rev TString_inRealRev
+```
+**16RevB** Convert all T strings to reverse complement.  
+For reverse strands, the aligned sequence is the reverse complement of the raw read. Because of this, the reverse complement of Tstrings must be used. 
+```
+python RevComp.py 
+```
+**16RevC.** Make new fasta file with TString sequence from any NonA base to end
+```
+python TString_End_Fwd.py
+```
+**16RevD.** Use fasta_formatter to make tables with Fasta ID, TString sequence (Step 14), Sequence from start to NonA base (Step 16RevC), Extended region sequence (Step13B), Aligned region sequence (Step 12), chromosome (Step 11), start position (Step 11), and end position (Step 11).
+
+**16RevE.** For reverse strands, if there is a NonA base in the reverse complemented Tstring AND the sequence from the START of the reverse complemented Tstring to the NonA base matches the START of the extended sequence, then:  
+- Matching sequence is added to beginning end read  
+- Matching sequence is removed from reverse complemented Tstring  
+- Matching sequence is removed from extended sequence  
+- The length of the matching sequence is added to the stop position of the aligned read.
+```
+python Match_Rev.py
 ```
 
