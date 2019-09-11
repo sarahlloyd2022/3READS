@@ -1,4 +1,4 @@
-###3READS+ Processing in Command Line
+## 3READS+ Processing in Command Line
 
 **1. Remove Adapters with Cutadapt**
 **2. Remove first four random nucleotides**
