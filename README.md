@@ -129,9 +129,35 @@ Yes for at least 2 unmappable Ts, No for < 2
 python Pass.py
 ```
 **17B.** Make new table with all rows that have Yes in new column (17A)
+This will be a table of all PASS reads. 
 ```
 sed '/No/d' Rev_PassInfo.txt > Rev_PASS
 sed '/No/d' Fwd_PassInfo.txt > Fwd_PASS
 ```
-**18. 
+**18. Make bed file of PASs**  
+PAS will be the 'stop' site for strands labeled reverse, and the 'start' site for strands labeled forward.  
+
+**19. Use bedtools merge to merge sites by 24 nucleotides**  
+
+**20. Make one master list of sites from all libraries to be compared, and merge by 24 nucleotides**  
+Concatenate bed files from each library to be compared (keep forward and reverse separate still). Use bedtools merge to merge these sites by 24 nucleotides.  
+
+**21. Build table of counts for each library using bedtools multicov**  
+Use -split parameter.  
+
+**22. Filter out sites from blacklist, retrotransposons, microRNA, and snoRNA.**  
+Blacklist from https://github.com/Boyle-Lab/Blacklist/blob/master/lists/hg19-blacklist.v2.bed.gz  
+Transposons from ucsc table browser ucscRetroInfo5  
+microRNA and snoRNA annotated in ucsc hg19 refseq file
+
+**23. Identify PASs overlapping with genes**
+Make bed file of all hg19 genes from uscsc hg19 refseq file. Use bedtools overlap to identify sites at genes. This can be used in analysis steps to assign each PAS to a gene from the correct strand. Use -wa -wb option to ouput bed information for both the PASs as well as the gene location.
+
+**24. Use counts table and bed file with sites overlapping with genes for analysis of PAS usage in R**
+Total counts per gene can be calculated in R. The percent of total usage can then be calculated for each site (PAScount/totalCountsAtGene). EdgeR or DEseq can be used to assess differential percent usage of sites. Homer annotation can be used to annotate sites. Refseq ID provided by homer should match gene assigned to PAS using the table of PASs intersected with Genes (step 23).
+
+
+
+
+
 
